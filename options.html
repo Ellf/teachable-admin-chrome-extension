@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teachable Admin Enhancer Options</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    label { display: block; margin-top: 10px; }
+    input[type="text"] { width: 200px; padding: 5px; }
+    button { margin-top: 20px; padding: 10px 20px; }
+  </style>
+</head>
+<body>
+<h1>Theme Options</h1>
+<form id="optionsForm">
+  <label>
+    Odd Row Color:
+    <input type="text" id="oddRowColor" placeholder="#af9dcb">
+  </label>
+  <label>
+    Even Row Color:
+    <input type="text" id="evenRowColor" placeholder="#c0b2d5">
+  </label>
+  <label>
+    User ID Background:
+    <input type="text" id="userIdBackground" placeholder="#8d73b4">
+  </label>
+  <button type="submit">Save Options</button>
+</form>
+<script src="dist/options.js"></script>
+</body>
+</html>
