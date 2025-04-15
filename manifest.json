@@ -1,12 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Teachable Admin Enhancer",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Adds user IDs to the Teachable admin dashboard and allows theme customization.",
-  "permissions": ["storage"],
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
   "host_permissions": [
-    "*://*/admin/users*",
-    "*://*/admin-app/site/power-editor*"
+    "*://*/admin/*",
+    "*://*/admin-app/site/*"
   ],
   "content_scripts": [
     {

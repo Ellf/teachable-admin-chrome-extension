@@ -1,7 +1,16 @@
 "use strict";
 // src/content.ts
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'reloadPage') {
+        window.location.reload();
+    }
+    // Return true if you wish to send an asynchronous response:
+    return false;
+});
 // Default theme, used if no settings are saved.
 const defaultTheme = {
+    hideRenewalNotice: false,
+    sideNavbar: '#5c4b76',
     oddRowColor: '#af9dcb',
     evenRowColor: '#c0b2d5',
     userIdBackground: '#8d73b4'
@@ -10,26 +19,31 @@ const defaultTheme = {
 chrome.storage.sync.get(defaultTheme, (theme) => {
     // Build CSS using retrieved theme.
     const css = `
-    :root {
-          --obsidian: #583f7d !important;
-          --obsidian-light: #af9dcb;
-        }
-        html, .admin-content, .tch-section-nav .tch-section-nav-wrapper .tch-section-nav-box { background: var(--obsidian-light) !important; }
-        tbody tr:nth-child(odd) {
-            background-color: #af9dcb !important; /* lighter version of #8d73b4 */
-        }
-        tbody tr:nth-child(even) {
-            background-color: #c0b2d5 !important;
-        }
-        .state-admin-users .student-table tr > td:not(:last-child) {
-            border-right: 1px solid #f3f3f3;
-        }
-        tr td:nth-of-type(11) {
-            display: flex;
-            justify-content: center;
-        }
-        #sidebar_layout_main_content { background: var(--obsidian-light); }
-  `;
+      :root {
+        --sideNavbar: ${theme.sideNavbar} !important;
+        --obsidian: ${theme.sideNavbar} !important;
+        --obsidian-light: ${theme.evenRowColor} !important;
+        --oddRowColor: ${theme.oddRowColor} !important;
+        --evenRowColor: ${theme.evenRowColor} !important;
+      }
+      html, .admin-content, .tch-section-nav .tch-section-nav-wrapper .tch-section-nav-box { 
+        background: var(--obsidian-light) !important;
+      }
+      tbody tr:nth-child(odd) {
+          background-color: var(--oddRowColor) !important;
+      }
+      tbody tr:nth-child(even) {
+          background-color: var(--evenRowColor) !important;
+      }
+      .state-admin-users .student-table tr > td:not(:last-child) {
+          border-right: 1px solid #f3f3f3;
+      }
+      tr td:nth-of-type(11) {
+          display: flex;
+          justify-content: center;
+      }
+      #sidebar_layout_main_content { background: var(--obsidian-light); }
+    `;
     const styleNode = document.createElement('style');
     styleNode.type = 'text/css';
     styleNode.appendChild(document.createTextNode(css));
@@ -63,14 +77,24 @@ chrome.storage.sync.get(defaultTheme, (theme) => {
                 }
             }
         });
-        // Optional: insert school ID if not already present.
-        if (!document.querySelector('.sc_id')) {
-            const schoolLink = document.querySelector('.school-link a.school-link-name');
-            if (schoolLink && window.hasOwnProperty('APP_CONFIG') && window.APP_CONFIG.school) {
-                schoolLink.insertAdjacentHTML('beforeend', `<p class="sc_id user_label jdGIU">(${window.APP_CONFIG.school._id})</p>`);
-            }
-        }
     };
+    function processNotice() {
+        // hide renewal notice
+        chrome.storage.sync.get({ hideRenewalNotice: true }, (data) => {
+            const notice = document.querySelector(".resume-school-subscription") || document.querySelector("[class*='ContentHeaderPromos']");
+            if (notice) {
+                if (!data.hideRenewalNotice) {
+                    notice.classList.remove('hidden');
+                }
+                else {
+                    notice.classList.add('hidden');
+                }
+            }
+            else {
+                console.log('notice not found.');
+            }
+        });
+    }
     // Debounce helper.
     let debounceTimer;
     const observeTable = () => {
@@ -107,7 +131,7 @@ chrome.storage.sync.get(defaultTheme, (theme) => {
     };
     // Initialize function—wait for Angular content then build UI.
     const init = () => {
-        waitForElement('.tch-table.student-table tbody tr.border-bottom', 15000)
+        waitForElement('.tch-table.student-table tbody tr.border-bottom', 3000)
             .then(() => {
             buildUI();
             const refreshInterval = setInterval(buildUI, 1000);
@@ -115,6 +139,22 @@ chrome.storage.sync.get(defaultTheme, (theme) => {
         })
             .catch((error) => console.error(error));
     };
+    function showSchoolId() {
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('showSchoolId');
+            if (!document.querySelector('.sc_id')) {
+                const schoolLink = document.querySelector('.school-link a.school-link-name') || document.querySelector('a.-ExLr');
+                if (schoolLink) {
+                    schoolLink.insertAdjacentHTML('beforeend', `<p class="sc_id user_label jdGIU">(${window.APP_CONFIG.school._id})</p>`);
+                }
+            }
+            else {
+                console.log('School not found');
+            }
+        });
+    }
     init();
     observeTable();
+    processNotice();
+    showSchoolId();
 });

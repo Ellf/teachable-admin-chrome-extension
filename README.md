@@ -1,0 +1,5 @@
+# Chrome Extension for Theming Teachable Admin
+
+One day, I got fed up having to continually click in to a users profile in order to see their Teachable user ID. So, I wrote a TamperMonkey script to inject these ID's into the users table. Then I thought, "Hey, wouldn't it be cool if I could color the table rows and make the whole page look more, well... colourful?" --- and hey presto the initial concept for the TamperMonkey script was borne.
+
+Fast-forward a few years and I revisited the original TamperMonkey script and wanted to push it to a wider audience, but TamperMonkey installation has too many steps and would likely scare away many potential user, so I thought, "Why not skip the middleman and just write a Chrome Extension?" [Sorry, Firefox/Safari users I will look and see what we can do for you guys].
